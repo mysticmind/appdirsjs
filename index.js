@@ -36,13 +36,17 @@ var os = require('os'),
  * @returns {string} Resulting path
  * @private
  */
-var appendNameAuthorVersion = function (dir, appname, appauthor, version, includeAppAuthor=false) {
+var appendNameAuthorVersion = function (dir, appname, appauthor, version, includeAppAuthor) {
+  if (includeAppAuthor === undefined) {
+    includeAppAuthor = false;
+  }
+
   if (appname) {
     if (includeAppAuthor)
     {
       if (!appauthor && appname)
       {
-        appauthor = appname
+        appauthor = appname;
       }
 
       if (appauthor) {
