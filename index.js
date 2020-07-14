@@ -123,7 +123,7 @@ exports.darwin = {
     return appendNameAuthorVersion(dir, appname, appauthor, version);
   },
   siteDataDir: function (appname, appauthor, version, multipath) {
-    var dir = appendNameAuthorVersion('/Library/Application Support', appname, version);
+    var dir = appendNameAuthorVersion('/Library/Application Support', appname, appauthor, version);
     if (multipath) {
       return [dir];
     }
