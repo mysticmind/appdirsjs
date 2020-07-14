@@ -16,8 +16,6 @@
  *       defaults to <code>appname</code>.</li>
  *   <li>Both the OS X and XDG implementations are portable, and will run on any
  *       platform.</li>
- *   <li>Windows support is unimplemented, because reasons. When it is
- *       implemented, it will probably only run on Windows</li>
  * </ul>
  * @module appdirs
  */
@@ -33,13 +31,27 @@ var os = require('os'),
  *
  * @param {string} dir Base directory.
  * @param {string} [appname] Optional name to append.
+ * @param {string} [appauthor] Optional author to append.
  * @param {string} [version] Optional version to append.
  * @returns {string} Resulting path
  * @private
  */
-var appendNameVersion = function (dir, appname, version) {
+var appendNameAuthorVersion = function (dir, appname, appauthor, version, includeAppAuthor=false) {
   if (appname) {
+    if (includeAppAuthor)
+    {
+      if (!appauthor && appname)
+      {
+        appauthor = appname
+      }
+
+      if (appauthor) {
+        dir = path.join(dir, appauthor);
+      }
+    }
+
     dir = path.join(dir, appname);
+
     if (version) {
       dir = path.join(dir, version);
     }
@@ -58,31 +70,31 @@ var appendNameVersion = function (dir, appname, version) {
 exports.windows = {
   userDataDir: function (appname, appauthor, version, roaming) {
     var dir = roaming ? process.env.APPDATA : process.env.LOCALAPPDATA;
-    return appendNameVersion(dir, appname, version);
+    return appendNameAuthorVersion(dir, appname, appauthor, version, true);
   },
   userConfigDir: function (appname, appauthor, version, roaming) {
     var dir = roaming ? process.env.APPDATA : process.env.LOCALAPPDATA;
-    return appendNameVersion(dir, appname, version);
+    return appendNameAuthorVersion(dir, appname, appauthor, version, true);
   },
   userCacheDir: function (appname, appauthor, version) {
-    return appendNameVersion(process.env.LOCALAPPDATA, appname, version);
+    return appendNameAuthorVersion(process.env.LOCALAPPDATA, appname, appauthor, version, true);
   },
   siteDataDir: function (appname, appauthor, version, multipath) {
-    var dir = appendNameVersion(process.env.ALLUSERSPROFILE, appname, version);
+    var dir = appendNameAuthorVersion(process.env.ALLUSERSPROFILE, appname, appauthor, version, true);
     if (multipath) {
       return [dir];
     }
     return dir;
   },
   siteConfigDir: function (appname, appauthor, version, multipath) {
-    var dir = appendNameVersion(process.env.ALLUSERSPROFILE, appname, version);
+    var dir = appendNameAuthorVersion(process.env.ALLUSERSPROFILE, appname, appauthor, version, true);
     if (multipath) {
       return [dir];
     }
     return dir;
   },
   userLogDir: function (appname, appauthor, version) {
-    return appendNameVersion(process.env.ALLUSERSPROFILE, appname, version);
+    return appendNameAuthorVersion(process.env.ALLUSERSPROFILE, appname, appauthor, version, true);
   }
 };
 
@@ -97,17 +109,17 @@ exports.windows = {
 exports.darwin = {
   userDataDir: function (appname, appauthor, version, roaming) {
     var dir = path.join(process.env.HOME, 'Library/Application Support');
-    return appendNameVersion(dir, appname, version);
+    return appendNameAuthorVersion(dir, appname, appauthor, version);
   },
   userConfigDir: function (appname, appauthor, version, roaming) {
     return exports.darwin.userDataDir(appname, appauthor, version, roaming);
   },
   userCacheDir: function (appname, appauthor, version) {
     var dir = path.join(process.env.HOME, 'Library/Caches');
-    return appendNameVersion(dir, appname, version);
+    return appendNameAuthorVersion(dir, appname, appauthor, version);
   },
   siteDataDir: function (appname, appauthor, version, multipath) {
-    var dir = appendNameVersion('/Library/Application Support', appname, version);
+    var dir = appendNameAuthorVersion('/Library/Application Support', appname, version);
     if (multipath) {
       return [dir];
     }
@@ -118,7 +130,7 @@ exports.darwin = {
   },
   userLogDir: function (appname, appauthor, version) {
     var dir = path.join(process.env.HOME, 'Library/Logs');
-    return appendNameVersion(dir, appname, version);
+    return appendNameAuthorVersion(dir, appname, appauthor, version);
   }
 };
 
@@ -135,23 +147,23 @@ exports.xdg = {
   userDataDir: function (appname, appauthor, version, roaming) {
     var dir = process.env.XDG_DATA_HOME ||
         path.join(process.env.HOME, '.local/share');
-    return appendNameVersion(dir, appname, version);
+    return appendNameAuthorVersion(dir, appname, appauthor, version);
   },
   userConfigDir: function (appname, appauthor, version, roaming) {
     var dir = process.env.XDG_CONFIG_HOME ||
         path.join(process.env.HOME, '.config');
-    return appendNameVersion(dir, appname, version);
+    return appendNameAuthorVersion(dir, appname, appauthor, version);
   },
   userCacheDir: function (appname, appauthor, version) {
     var dir = process.env.XDG_CACHE_HOME ||
         path.join(process.env.HOME, '.cache');
-    return appendNameVersion(dir, appname, version);
+    return appendNameAuthorVersion(dir, appname, appauthor, version);
   },
   siteDataDir: function (appname, appauthor, version, multipath) {
     var dirstr = process.env.XDG_DATA_DIRS ||
             ['/usr/local/share', '/usr/share'].join(path.delimiter),
         dirs = dirstr.split(path.delimiter).map(function (dir) {
-          return appendNameVersion(dir, appname, version);
+          return appendNameAuthorVersion(dir, appname, appauthor, version);
         });
     if (multipath) {
       return dirs;
@@ -162,7 +174,7 @@ exports.xdg = {
   siteConfigDir: function (appname, appauthor, version, multipath) {
     var dirstr = process.env.XDG_CONFIG_DIRS || '/etc/xdg',
         dirs = dirstr.split(path.delimiter).map(function (dir) {
-          return appendNameVersion(dir, appname, version);
+          return appendNameAuthorVersion(dir, appname, appauthor, version);
         });
     if (multipath) {
       return dirs;

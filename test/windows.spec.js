@@ -48,14 +48,22 @@ describe('AppDirs on Windows', function () {
     });
     it('should include appname', function () {
       expect(uut.userDataDir('someApp')).to.equal(
-          'C:\\Users\\fakeuser\\AppData\\Local\\someApp');
+          'C:\\Users\\fakeuser\\AppData\\Local\\someApp\\someApp');
     });
     it('should include version', function () {
       expect(uut.userDataDir('someApp', null, '3.1')).to.equal(
-          'C:\\Users\\fakeuser\\AppData\\Local\\someApp\\3.1');
+          'C:\\Users\\fakeuser\\AppData\\Local\\someApp\\someApp\\3.1');
     });
     it('should ignore version if appname is null', function () {
       expect(uut.userDataDir(null, null, '3.1')).to.equal(
+          'C:\\Users\\fakeuser\\AppData\\Local');
+    });
+    it('should include appauthor', function () {
+      expect(uut.userDataDir('someApp', 'appAuthor', '3.1')).to.equal(
+          'C:\\Users\\fakeuser\\AppData\\Local\\appAuthor\\someApp\\3.1');
+    });
+    it('should ignore appauthor if appname is null', function () {
+      expect(uut.userDataDir(null, 'appAuthor',null)).to.equal(
           'C:\\Users\\fakeuser\\AppData\\Local');
     });
   });
@@ -71,14 +79,22 @@ describe('AppDirs on Windows', function () {
     });
     it('should include appname', function () {
       expect(uut.userConfigDir('someApp')).to.equal(
-          'C:\\Users\\fakeuser\\AppData\\Local\\someApp');
+          'C:\\Users\\fakeuser\\AppData\\Local\\someApp\\someApp');
     });
     it('should include version', function () {
       expect(uut.userConfigDir('someApp', null, '3.1')).to.equal(
-          'C:\\Users\\fakeuser\\AppData\\Local\\someApp\\3.1');
+          'C:\\Users\\fakeuser\\AppData\\Local\\someApp\\someApp\\3.1');
     });
     it('should ignore version if appname is null', function () {
       expect(uut.userConfigDir(null, null, '3.1')).to.equal(
+          'C:\\Users\\fakeuser\\AppData\\Local');
+    });
+    it('should include appauthor', function () {
+      expect(uut.userConfigDir('someApp', 'appAuthor', '3.1')).to.equal(
+          'C:\\Users\\fakeuser\\AppData\\Local\\appAuthor\\someApp\\3.1');
+    });
+    it('should ignore appauthor if appname is null', function () {
+      expect(uut.userConfigDir(null, 'appAuthor',null)).to.equal(
           'C:\\Users\\fakeuser\\AppData\\Local');
     });
   });
@@ -90,14 +106,22 @@ describe('AppDirs on Windows', function () {
     });
     it('should include appname', function () {
       expect(uut.userCacheDir('someApp')).to.equal(
-          'C:\\Users\\fakeuser\\AppData\\Local\\someApp');
+          'C:\\Users\\fakeuser\\AppData\\Local\\someApp\\someApp');
     });
     it('should include version', function () {
       expect(uut.userCacheDir('someApp', null, '3.1')).to.equal(
-          'C:\\Users\\fakeuser\\AppData\\Local\\someApp\\3.1');
+          'C:\\Users\\fakeuser\\AppData\\Local\\someApp\\someApp\\3.1');
     });
     it('should ignore version if appname is null', function () {
       expect(uut.userCacheDir(null, null, '3.1')).to.equal(
+          'C:\\Users\\fakeuser\\AppData\\Local');
+    });
+    it('should include appauthor', function () {
+      expect(uut.userCacheDir('someApp', 'appAuthor', '3.1')).to.equal(
+          'C:\\Users\\fakeuser\\AppData\\Local\\appAuthor\\someApp\\3.1');
+    });
+    it('should ignore appauthor if appname is null', function () {
+      expect(uut.userCacheDir(null, 'appAuthor',null)).to.equal(
           'C:\\Users\\fakeuser\\AppData\\Local');
     });
   });
@@ -109,11 +133,11 @@ describe('AppDirs on Windows', function () {
     });
     it('should include appname', function () {
       expect(uut.siteDataDir('someApp')).to.equal(
-          'C:\\ProgramData\\someApp');
+          'C:\\ProgramData\\someApp\\someApp');
     });
     it('should include version', function () {
       expect(uut.siteDataDir('someApp', null, '3.1')).to.equal(
-          'C:\\ProgramData\\someApp\\3.1');
+          'C:\\ProgramData\\someApp\\someApp\\3.1');
     });
     it('should ignore version if appname is null', function () {
       expect(uut.siteDataDir(null, null, '3.1')).to.equal(
@@ -121,50 +145,73 @@ describe('AppDirs on Windows', function () {
     });
     it('should handle multipath = true', function () {
       expect(uut.siteDataDir('someApp', null, '3.1', true)).to.deep.equal(
-          ['C:\\ProgramData\\someApp\\3.1']);
+          ['C:\\ProgramData\\someApp\\someApp\\3.1']);
+    });
+    it('should include appauthor', function () {
+      expect(uut.siteDataDir('someApp', 'appAuthor', '3.1')).to.equal(
+          'C:\\ProgramData\\appAuthor\\someApp\\3.1');
+    });
+    it('should ignore appauthor if appname is null', function () {
+      expect(uut.siteDataDir(null, 'appAuthor',null)).to.equal(
+          'C:\\ProgramData');
     });
   });
 
   describe('siteConfigDir', function () {
     it('should default to C:\\ProgramData', function () {
-      expect(uut.siteDataDir()).to.equal(
+      expect(uut.siteConfigDir()).to.equal(
           'C:\\ProgramData');
     });
     it('should include appname', function () {
-      expect(uut.siteDataDir('someApp')).to.equal(
-          'C:\\ProgramData\\someApp');
+      expect(uut.siteConfigDir('someApp')).to.equal(
+          'C:\\ProgramData\\someApp\\someApp');
     });
     it('should include version', function () {
-      expect(uut.siteDataDir('someApp', null, '3.1')).to.equal(
-          'C:\\ProgramData\\someApp\\3.1');
+      expect(uut.siteConfigDir('someApp', null, '3.1')).to.equal(
+          'C:\\ProgramData\\someApp\\someApp\\3.1');
     });
     it('should ignore version if appname is null', function () {
-      expect(uut.siteDataDir(null, null, '3.1')).to.equal(
+      expect(uut.siteConfigDir(null, null, '3.1')).to.equal(
           'C:\\ProgramData');
     });
     it('should handle multipath = true', function () {
-      expect(uut.siteDataDir('someApp', null, '3.1', true)).to.deep.equal(
-          ['C:\\ProgramData\\someApp\\3.1']);
+      expect(uut.siteConfigDir('someApp', null, '3.1', true)).to.deep.equal(
+          ['C:\\ProgramData\\someApp\\someApp\\3.1']);
+    });
+    it('should include appauthor', function () {
+      expect(uut.siteConfigDir('someApp', 'appAuthor', '3.1')).to.equal(
+          'C:\\ProgramData\\appAuthor\\someApp\\3.1');
+    });
+    it('should ignore appauthor if appname is null', function () {
+      expect(uut.siteConfigDir(null, 'appAuthor',null)).to.equal(
+          'C:\\ProgramData');
     });
   });
 
   describe('userLogDir', function () {
     it('should default to C:\\ProgramData', function () {
-      expect(uut.siteDataDir()).to.equal(
+      expect(uut.userLogDir()).to.equal(
           'C:\\ProgramData');
     });
     it('should include appname', function () {
-      expect(uut.siteDataDir('someApp')).to.equal(
-          'C:\\ProgramData\\someApp');
+      expect(uut.userLogDir('someApp')).to.equal(
+          'C:\\ProgramData\\someApp\\someApp');
     });
     it('should include version', function () {
-      expect(uut.siteDataDir('someApp', null, '3.1')).to.equal(
-          'C:\\ProgramData\\someApp\\3.1');
+      expect(uut.userLogDir('someApp', null, '3.1')).to.equal(
+          'C:\\ProgramData\\someApp\\someApp\\3.1');
     });
     it('should ignore version if appname is null', function () {
-      expect(uut.siteDataDir(null, null, '3.1')).to.equal(
+      expect(uut.userLogDir(null, null, '3.1')).to.equal(
+          'C:\\ProgramData');
+    });
+    it('should include appauthor', function () {
+      expect(uut.userLogDir('someApp', 'appAuthor', '3.1')).to.equal(
+          'C:\\ProgramData\\appAuthor\\someApp\\3.1');
+    });
+    it('should ignore appauthor if appname is null', function () {
+      expect(uut.userLogDir(null, 'appAuthor',null)).to.equal(
           'C:\\ProgramData');
     });
   });
-
 });

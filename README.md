@@ -14,10 +14,6 @@ This package is a port of the Python [appdirs][] library, which provides a small
 set of methods which can be used to locate the preferred directories for user
 and site data for an application.
 
-It currently supports OS X and Unix operating systems (Unix support is
-according to the [XDG specification][]). Windows support is not yet
-implemented, but a pull request adding that would be greatly appreciated!
-
 ## Installation
 
 AppDirs.js is [hosted on NPM][], so you can simply install it, and add
