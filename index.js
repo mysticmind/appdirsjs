@@ -24,28 +24,30 @@ var os = require('os'),
     path = require('path');
 
 /**
- * Append the name and and version to a path.
+ * Append the name, author and version to a path.
  *
- * Both the appname and version are optional. The version is only appended if
- * the appname.
+ * appname, appauthor and version are optional. The appauthor and version is only appended if
+ * the appname is passed.
+ * appauthor is included in path only if includeAppAuthor flag is true.
+ * appname will be used for appauthor if it is not passed
  *
  * @param {string} dir Base directory.
  * @param {string} [appname] Optional name to append.
  * @param {string} [appauthor] Optional author to append.
  * @param {string} [version] Optional version to append.
+ * @param {object} [includeAppAuthor] optional configuration to include or exclude app author from path.
  * @returns {string} Resulting path
  * @private
  */
 var appendNameAuthorVersion = function (dir, appname, appauthor, version, includeAppAuthor) {
-  if (includeAppAuthor === undefined) {
+  if (includeAppAuthor === undefined)
+  {
     includeAppAuthor = false;
   }
 
   if (appname) {
-    if (includeAppAuthor)
-    {
-      if (!appauthor && appname)
-      {
+    if (includeAppAuthor) {
+      if (!appauthor && appname) {
         appauthor = appname;
       }
 
@@ -63,6 +65,22 @@ var appendNameAuthorVersion = function (dir, appname, appauthor, version, includ
   return dir;
 };
 
+/**
+ * Append the name and and version to a path.
+ *
+ * Both the appname and version are optional. The version is only appended if
+ * the appname.
+ *
+ * @param {string} dir Base directory.
+ * @param {string} [appname] Optional name to append.
+ * @param {string} [version] Optional version to append.
+ * @returns {string} Resulting path
+ * @private
+ */
+var appendNameVersion = function (dir, appname, version) {
+  return appendNameAuthorVersion(dir, appname, null, version, false)
+};
+
 /*jshint maxlen:false */
 /**
  * Windows appdirs implementation.
@@ -72,33 +90,34 @@ var appendNameAuthorVersion = function (dir, appname, appauthor, version, includ
  */
 /*jshint maxlen:80 */
 exports.windows = {
+  includeAppAuthor: false,
   userDataDir: function (appname, appauthor, version, roaming) {
     var dir = roaming ? process.env.APPDATA : process.env.LOCALAPPDATA;
-    return appendNameAuthorVersion(dir, appname, appauthor, version, true);
+    return appendNameAuthorVersion(dir, appname, appauthor, version, this.includeAppAuthor);
   },
   userConfigDir: function (appname, appauthor, version, roaming) {
     var dir = roaming ? process.env.APPDATA : process.env.LOCALAPPDATA;
-    return appendNameAuthorVersion(dir, appname, appauthor, version, true);
+    return appendNameAuthorVersion(dir, appname, appauthor, version, this.includeAppAuthor);
   },
   userCacheDir: function (appname, appauthor, version) {
-    return appendNameAuthorVersion(process.env.LOCALAPPDATA, appname, appauthor, version, true);
+    return appendNameAuthorVersion(process.env.LOCALAPPDATA, appname, appauthor, version, this.includeAppAuthor);
   },
   siteDataDir: function (appname, appauthor, version, multipath) {
-    var dir = appendNameAuthorVersion(process.env.ALLUSERSPROFILE, appname, appauthor, version, true);
+    var dir = appendNameAuthorVersion(process.env.ALLUSERSPROFILE, appname, appauthor, version, this.includeAppAuthor);
     if (multipath) {
       return [dir];
     }
     return dir;
   },
   siteConfigDir: function (appname, appauthor, version, multipath) {
-    var dir = appendNameAuthorVersion(process.env.ALLUSERSPROFILE, appname, appauthor, version, true);
+    var dir = appendNameAuthorVersion(process.env.ALLUSERSPROFILE, appname, appauthor, version, this.includeAppAuthor);
     if (multipath) {
       return [dir];
     }
     return dir;
   },
   userLogDir: function (appname, appauthor, version) {
-    return appendNameAuthorVersion(process.env.ALLUSERSPROFILE, appname, appauthor, version, true);
+    return appendNameAuthorVersion(process.env.ALLUSERSPROFILE, appname, appauthor, version, this.includeAppAuthor);
   }
 };
 
@@ -111,19 +130,20 @@ exports.windows = {
  */
 /*jshint maxlen:80 */
 exports.darwin = {
+  includeAppAuthor: false,
   userDataDir: function (appname, appauthor, version, roaming) {
     var dir = path.join(process.env.HOME, 'Library/Application Support');
-    return appendNameAuthorVersion(dir, appname, appauthor, version);
+    return appendNameVersion(dir, appname, version);
   },
   userConfigDir: function (appname, appauthor, version, roaming) {
     return exports.darwin.userDataDir(appname, appauthor, version, roaming);
   },
   userCacheDir: function (appname, appauthor, version) {
     var dir = path.join(process.env.HOME, 'Library/Caches');
-    return appendNameAuthorVersion(dir, appname, appauthor, version);
+    return appendNameVersion(dir, appname, version);
   },
   siteDataDir: function (appname, appauthor, version, multipath) {
-    var dir = appendNameAuthorVersion('/Library/Application Support', appname, appauthor, version);
+    var dir = appendNameVersion('/Library/Application Support', appname, version);
     if (multipath) {
       return [dir];
     }
@@ -134,7 +154,7 @@ exports.darwin = {
   },
   userLogDir: function (appname, appauthor, version) {
     var dir = path.join(process.env.HOME, 'Library/Logs');
-    return appendNameAuthorVersion(dir, appname, appauthor, version);
+    return appendNameVersion(dir, appname, version);
   }
 };
 
@@ -148,26 +168,27 @@ exports.darwin = {
  */
 /*jshint maxlen:80 */
 exports.xdg = {
+  includeAppAuthor: false,
   userDataDir: function (appname, appauthor, version, roaming) {
     var dir = process.env.XDG_DATA_HOME ||
         path.join(process.env.HOME, '.local/share');
-    return appendNameAuthorVersion(dir, appname, appauthor, version);
+    return appendNameVersion(dir, appname, version);
   },
   userConfigDir: function (appname, appauthor, version, roaming) {
     var dir = process.env.XDG_CONFIG_HOME ||
         path.join(process.env.HOME, '.config');
-    return appendNameAuthorVersion(dir, appname, appauthor, version);
+    return appendNameVersion(dir, appname, version);
   },
   userCacheDir: function (appname, appauthor, version) {
     var dir = process.env.XDG_CACHE_HOME ||
         path.join(process.env.HOME, '.cache');
-    return appendNameAuthorVersion(dir, appname, appauthor, version);
+    return appendNameVersion(dir, appname, version);
   },
   siteDataDir: function (appname, appauthor, version, multipath) {
     var dirstr = process.env.XDG_DATA_DIRS ||
             ['/usr/local/share', '/usr/share'].join(path.delimiter),
         dirs = dirstr.split(path.delimiter).map(function (dir) {
-          return appendNameAuthorVersion(dir, appname, appauthor, version);
+          return appendNameVersion(dir, appname, version);
         });
     if (multipath) {
       return dirs;
@@ -178,7 +199,7 @@ exports.xdg = {
   siteConfigDir: function (appname, appauthor, version, multipath) {
     var dirstr = process.env.XDG_CONFIG_DIRS || '/etc/xdg',
         dirs = dirstr.split(path.delimiter).map(function (dir) {
-          return appendNameAuthorVersion(dir, appname, appauthor, version);
+          return appendNameVersion(dir, appname, version);
         });
     if (multipath) {
       return dirs;
@@ -212,15 +233,17 @@ var impl = (function () {
  * @param {boolean} [roaming] If true, use directory for roaming profile.
  * @param {boolean} [multipath] If true, return arrays for multipath functions
  *                              (siteDataDir, siteConfigDir).
+ * @param {boolean} [includeAppAuthor] If true, include application author in path for Windows.
  * @constructor
  */
 var AppDirs = exports.AppDirs =
-    function AppDirs(appname, appauthor, version, roaming, multipath) {
+    function AppDirs(appname, appauthor, version, roaming, multipath, includeAppAuthor) {
       this.appname = appname;
       this.appauthor = appauthor;
       this.version = version;
       this.roaming = roaming;
       this.multipath = multipath;
+      this.includeAppAuthor = includeAppAuthor;
     };
 
 /**
@@ -228,6 +251,7 @@ var AppDirs = exports.AppDirs =
  * @returns {string}
  */
 AppDirs.prototype.userDataDir = function () {
+  impl.includeAppAuthor = this.includeAppAuthor;
   return impl.userDataDir(this.appname, this.appauthor, this.version,
       this.roaming);
 };
@@ -237,6 +261,7 @@ AppDirs.prototype.userDataDir = function () {
  * @returns {string}
  */
 AppDirs.prototype.userConfigDir = function () {
+  impl.includeAppAuthor = this.includeAppAuthor;
   return impl.userConfigDir(this.appname, this.appauthor, this.version,
       this.roaming);
 };
@@ -246,6 +271,7 @@ AppDirs.prototype.userConfigDir = function () {
  * @returns {string}
  */
 AppDirs.prototype.userCacheDir = function () {
+  impl.includeAppAuthor = this.includeAppAuthor;
   return impl.userCacheDir(this.appname, this.appauthor, this.version);
 };
 
@@ -254,6 +280,7 @@ AppDirs.prototype.userCacheDir = function () {
  * @returns {string}
  */
 AppDirs.prototype.siteDataDir = function () {
+  impl.includeAppAuthor = this.includeAppAuthor;
   return impl.siteDataDir(this.appname, this.appauthor, this.version,
       this.multipath);
 };
@@ -263,6 +290,7 @@ AppDirs.prototype.siteDataDir = function () {
  * @returns {string}
  */
 AppDirs.prototype.siteConfigDir = function () {
+  impl.includeAppAuthor = this.includeAppAuthor;
   return impl.siteConfigDir(this.appname, this.appauthor, this.version,
       this.multipath);
 };
@@ -272,6 +300,7 @@ AppDirs.prototype.siteConfigDir = function () {
  * @returns {string}
  */
 AppDirs.prototype.userLogDir = function () {
+  impl.includeAppAuthor = this.includeAppAuthor;
   return impl.userLogDir(this.appname, this.appauthor, this.version);
 };
 

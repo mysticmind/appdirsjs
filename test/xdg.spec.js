@@ -13,6 +13,9 @@ describe('AppDirs on *NIX', function () {
   var envOrig,
       uut = appdirs.xdg;
 
+  // this flag does not affect darwin so setting to true to confirm the unit are passing as before
+  uut.includeAppAuthor = true;
+
   before(function () {
     envOrig = {
       XDG_DATA_HOME: process.env.XDG_DATA_HOME,

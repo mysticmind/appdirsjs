@@ -13,6 +13,9 @@ describe('AppDirs on Mac', function () {
   var homeOrig,
       uut = appdirs.darwin;
 
+  // this flag does not affect darwin so setting to true to confirm the unit are passing as before
+  uut.includeAppAuthor = true;
+
   before(function () {
     homeOrig = process.env.HOME;
     process.env.HOME = '/Users/fake-home';
