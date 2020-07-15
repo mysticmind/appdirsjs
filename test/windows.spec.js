@@ -4,11 +4,16 @@
 'use strict';
 
 var appdirs = require('..'),
+    os = require('os'),
     path = require('path'),
     chai = require('chai'),
     expect = chai.expect;
 
 chai.config.includeStack = true;
+
+if (os.platform() !== 'win32') {
+  return;
+}
 
 describe('AppDirs on Windows', function () {
   var localAppData,
