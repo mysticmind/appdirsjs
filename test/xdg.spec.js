@@ -4,10 +4,15 @@
 'use strict';
 
 var appdirs = require('..'),
+    os = require('os'),
     chai = require('chai'),
     expect = chai.expect;
 
 chai.config.includeStack = true;
+
+if (os.platform() === 'win32' || os.platform() === 'darwin') {
+  return;
+}
 
 describe('AppDirs on *NIX', function () {
   var envOrig,
